@@ -3,6 +3,7 @@ import {
   type EnvironmentId,
   type UsageBucket,
   type UsageProviderKind,
+  type UsageRelaySummary,
   type UsageSource,
   type UsageSourceFingerprint,
   type UsageSummary,
@@ -106,6 +107,7 @@ export interface MergedUsage {
   readonly duplicateSources: readonly string[];
   readonly contributingEnvironments: readonly EnvironmentId[];
   readonly contractMismatches: readonly UsageContractMismatch[];
+  readonly relay: UsageRelaySummary | null;
 }
 
 // volumeId distinguishes machines sharing a hostname and home path.
@@ -326,6 +328,7 @@ const EMPTY_MERGED: MergedUsage = {
   duplicateSources: [],
   contributingEnvironments: [],
   contractMismatches: [],
+  relay: null,
 };
 
 export function mergeUsage(
@@ -618,5 +621,6 @@ export function mergeUsage(
     duplicateSources: duplicates,
     contributingEnvironments,
     contractMismatches,
+    relay: current.find((environment) => environment.summary.relay != null)?.summary.relay ?? null,
   };
 }

@@ -40,6 +40,7 @@ import type {
   UsageRecord,
 } from "@t3tools/provider-core/server/usage";
 import { canonicalModelFilter, resolveModelAliases, UsageAggregator } from "./usageAggregation.ts";
+import { readRelayUsage } from "./relayUsage.ts";
 import {
   createOverrideRateTable,
   isUnlistedModel,
@@ -1249,7 +1250,10 @@ export const make = Effect.gen(function* () {
         return created;
       }),
     );
-    return yield* Deferred.await(deferred);
+    const summary = yield* Deferred.await(deferred);
+    // The relay knows the real quota and spend; transcripts only estimate list price.
+    const relay = yield* readRelayUsage(requested.awaitRefresh === true);
+    return { ...summary, relay };
   });
 
   return { readSummary, refreshRates, awaitPersisted } as const;

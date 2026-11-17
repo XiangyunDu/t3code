@@ -2,7 +2,7 @@ import type { UsageProviderKind } from "@t3tools/contracts";
 
 import { ProviderDriverKind } from "@t3tools/contracts";
 
-import type { UsageMetric } from "./usageShortcuts";
+import type { UsageChartMetric } from "./UsageProviderChart";
 
 type UsageProviderPresentation = {
   readonly label: string;
@@ -73,7 +73,7 @@ export function rankProvidersByMetric(
     readonly costUsd: number;
     readonly totalTokens: number;
   }[],
-  metric: UsageMetric,
+  metric: UsageChartMetric,
 ): readonly UsageProviderKind[] {
   const field = metric === "cost" ? "costUsd" : "totalTokens";
   const value = (provider: UsageProviderKind) =>

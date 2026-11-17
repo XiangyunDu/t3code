@@ -133,6 +133,48 @@ export const UsageModelFilter = Schema.Struct({
 });
 export type UsageModelFilter = typeof UsageModelFilter.Type;
 
+export const UsageRelayDay = Schema.Struct({
+  day: TrimmedNonEmptyString,
+  requests: NonNegativeInt,
+  inputTokens: NonNegativeInt,
+  outputTokens: NonNegativeInt,
+  cacheReadTokens: NonNegativeInt,
+  cacheWriteTokens: NonNegativeInt,
+  totalTokens: NonNegativeInt,
+  costUsd: Schema.Number,
+});
+export type UsageRelayDay = typeof UsageRelayDay.Type;
+
+export const UsageRelayModel = Schema.Struct({
+  model: TrimmedNonEmptyString,
+  requests: NonNegativeInt,
+  totalTokens: NonNegativeInt,
+  costUsd: Schema.Number,
+});
+export type UsageRelayModel = typeof UsageRelayModel.Type;
+
+/** Quota and spend the relay reports for itself; the transcripts can only estimate list price. */
+export const UsageRelaySummary = Schema.Struct({
+  planName: Schema.NullOr(TrimmedNonEmptyString),
+  unit: TrimmedNonEmptyString,
+  isValid: Schema.Boolean,
+  mode: Schema.NullOr(TrimmedNonEmptyString),
+  remainingUsd: Schema.NullOr(Schema.Number),
+  dailyLimitUsd: Schema.NullOr(Schema.Number),
+  dailyUsedUsd: Schema.NullOr(Schema.Number),
+  weeklyLimitUsd: Schema.NullOr(Schema.Number),
+  weeklyUsedUsd: Schema.NullOr(Schema.Number),
+  monthlyLimitUsd: Schema.NullOr(Schema.Number),
+  monthlyUsedUsd: Schema.NullOr(Schema.Number),
+  expiresAt: Schema.NullOr(TrimmedNonEmptyString),
+  today: UsageRelayDay,
+  days: ForwardCompatibleArray(UsageRelayDay),
+  models: ForwardCompatibleArray(UsageRelayModel),
+  fetchedAt: TrimmedNonEmptyString,
+  endpoint: TrimmedNonEmptyString,
+});
+export type UsageRelaySummary = typeof UsageRelaySummary.Type;
+
 export const UsageSummaryInput = Schema.Struct({
   sinceDay: UsageDay,
   untilDay: UsageDay,
@@ -160,6 +202,8 @@ export const UsageSummary = Schema.Struct({
   scanDurationMs: NonNegativeInt,
   /** The filter the server applied; absent means unfiltered, including servers that predate filters. */
   modelFilter: Schema.optional(UsageModelFilter),
+  /** Relay quota; null when the active provider exposes no usage endpoint. */
+  relay: Schema.optional(Schema.NullOr(UsageRelaySummary)),
 });
 export type UsageSummary = typeof UsageSummary.Type;
 

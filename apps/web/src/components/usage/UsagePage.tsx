@@ -82,6 +82,7 @@ import { UsagePriceOverrides } from "./UsagePriceOverrides";
 import { UsageProviderChart } from "./UsageProviderChart";
 import { SpeedPremium, UsageModelDialog } from "./UsageModelDialog";
 import { UsageShareBar } from "./UsageShareBar";
+import { RelayUsageView } from "./RelayUsageView";
 import {
   costTypeSegments,
   modelShare,
@@ -214,6 +215,8 @@ export function UsagePage() {
     refresh,
   } = useUsage(window, selectedEnvironmentIds, hiddenProviders);
   const merged = shown?.merged ?? answeredUsage;
+  // Copy the relay block out of the union so JSX narrowing holds without re-reading it.
+  const relayUsage = merged.relay;
   const shownWindow = shown?.window ?? window;
   const shownHourly = shownWindow.resolution === "hour";
   const refreshingUsage = isRefreshing && !showingLimits;
@@ -533,6 +536,8 @@ export function UsagePage() {
                   </p>
                 ))}
               </div>
+            ) : metric === "cost" && relayUsage != null ? (
+              <RelayUsageView relay={relayUsage} windowDays={windowDays} />
             ) : (
               <UsageOverview
                 merged={merged}
@@ -541,7 +546,7 @@ export function UsagePage() {
                 days={days}
                 hours={hours}
                 showingKept={showingKept}
-                metric={metric === "tokens" ? "tokens" : "cost"}
+                metric="cost"
                 selectedEnvironments={selectedEnvironments}
                 hiddenProviders={hiddenProviders}
                 refreshingUsage={refreshingUsage}
@@ -556,7 +561,7 @@ export function UsagePage() {
         <UsageModelDialogHost
           models={merged.models}
           environments={selectedEnvironments}
-          metric={metric === "tokens" ? "tokens" : "cost"}
+          metric="cost"
           chartWindow={{
             days,
             hours,

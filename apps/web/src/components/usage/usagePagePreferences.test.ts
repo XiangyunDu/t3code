@@ -28,8 +28,8 @@ describe("Usage page preferences", () => {
     saveUsagePagePreferences({ metric: "cost", windowDays: 7, hiddenProviders: ["codex"] });
     expect(readUsagePagePreferences().hiddenProviders).toEqual(["codex"]);
 
-    values.set(key, '{"metric":"tokens","windowDays":30}');
-    expect(readUsagePagePreferences()).toEqual({ metric: "tokens", windowDays: 30 });
+    values.set(key, '{"metric":"cost","windowDays":30}');
+    expect(readUsagePagePreferences()).toEqual({ metric: "cost", windowDays: 30 });
   });
 
   // regression: #10189 an invalid saved usage selection was never replaced
@@ -39,8 +39,8 @@ describe("Usage page preferences", () => {
     '{"metric":"cost","windowDays":365}',
   ])("replaces invalid preferences on the next save: %s", (value) => {
     values.set(key, value);
-    expect(readUsagePagePreferences()).toEqual({ metric: "limits", windowDays: 30 });
-    saveUsagePagePreferences({ metric: "tokens", windowDays: 7 });
-    expect(readUsagePagePreferences()).toEqual({ metric: "tokens", windowDays: 7 });
+    expect(readUsagePagePreferences()).toEqual({ metric: "cost", windowDays: 30 });
+    saveUsagePagePreferences({ metric: "cost", windowDays: 7 });
+    expect(readUsagePagePreferences()).toEqual({ metric: "cost", windowDays: 7 });
   });
 });
