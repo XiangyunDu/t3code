@@ -41,13 +41,13 @@ jobs:
       - run: pnpm -r --filter './packages/**' test
 
   test-server:
-    name: Tests (server ${{ matrix.shard }}/4)
+    name: Tests (server ${{ matrix.shard }}/8)
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -58,7 +58,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       # apps/server/src/preview 的测试跑真实浏览器上下文，缺 chromium 会失败
       - run: node apps/server/node_modules/playwright-core/cli.js install --only-shell chromium
-      - run: pnpm --filter t3 test -- --shard ${{ matrix.shard }}/4
+      # 两核机器上默认并发会互相拖死，和上游一致限到 4
+      - run: pnpm --filter t3 test -- --shard ${{ matrix.shard }}/8 --concurrency 4
 
   test-web-unit:
     name: Tests (web unit ${{ matrix.shard }}/2)
