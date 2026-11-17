@@ -1,0 +1,23 @@
+name: Browser tests
+# 手动触发：仓库 Actions 页 → 左侧 "Browser tests" → Run workflow
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser:
+    name: Web browser tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26.13.1
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: node apps/web/node_modules/playwright/cli.js install --only-shell chromium
+      - run: pnpm --filter @t3tools/web exec vp test run --project browser
