@@ -2,6 +2,7 @@ import type { UsageRelayDay, UsageRelayModel, UsageRelaySummary } from "@t3tools
 import { formatCount, formatTokens, formatUsd } from "@t3tools/shared/usageFormat";
 
 import { cn } from "../../lib/utils";
+import { Tooltip, TooltipPopup, TooltipTrigger } from "../ui/tooltip";
 
 /** Mirrors the provider accents already used elsewhere on the usage page. */
 const DONUT_COLORS = [
@@ -62,12 +63,10 @@ function Tile({
 }) {
   return (
     <div className="flex flex-col gap-1 rounded-lg border border-border bg-card px-4 py-3">
-      <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
-        {label}
-      </p>
+      <p className="text-2xs font-medium tracking-wide text-muted-foreground uppercase">{label}</p>
       <p className="text-lg font-semibold text-foreground tabular-nums">{value}</p>
       {hint === undefined ? null : (
-        <p className="text-[11px] text-muted-foreground tabular-nums">{hint}</p>
+        <p className="text-2xs text-muted-foreground tabular-nums">{hint}</p>
       )}
     </div>
   );
@@ -93,20 +92,18 @@ function SpendBars({
     <div className="flex flex-col gap-3">
       <div className="flex items-baseline justify-between gap-3">
         <div>
-          <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+          <p className="text-2xs font-medium tracking-wide text-muted-foreground uppercase">
             每日消费
           </p>
-          <p className="text-2xl font-semibold text-foreground tabular-nums">
-            {formatUsd(total)}
-          </p>
+          <p className="text-2xl font-semibold text-foreground tabular-nums">{formatUsd(total)}</p>
         </div>
-        <div className="flex flex-col items-end gap-1 text-[11px] text-muted-foreground tabular-nums">
+        <div className="flex flex-col items-end gap-1 text-2xs text-muted-foreground tabular-nums">
           <span>峰值 {compactUsd(peak)}</span>
           <span>{visible.length} 天</span>
         </div>
       </div>
       <div className="relative flex h-44 gap-1 pt-5">
-        <div className="pointer-events-none absolute inset-x-0 top-5 bottom-6 flex flex-col justify-between text-[10px] text-muted-foreground tabular-nums">
+        <div className="pointer-events-none absolute inset-x-0 top-5 bottom-6 flex flex-col justify-between text-3xs text-muted-foreground tabular-nums">
           <span className="border-b border-border/40 pb-0.5">{compactUsd(axisMax)}</span>
           <span className="border-b border-border/40 pb-0.5">{compactUsd(axisMax / 2)}</span>
           <span>$0</span>
@@ -117,21 +114,29 @@ function SpendBars({
             return (
               <div
                 key={day.day}
-                className="group flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-1"
-                title={`${day.day} · ${formatUsd(day.costUsd)} · ${formatCount(day.requests)} 次请求`}
+                className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-1"
               >
                 {showValues && day.costUsd > 0 ? (
-                  <span className="text-[9px] text-muted-foreground tabular-nums">
+                  <span className="text-4xs text-muted-foreground tabular-nums">
                     {day.costUsd >= 10 ? Math.round(day.costUsd) : day.costUsd.toFixed(1)}
                   </span>
                 ) : null}
-                <div
-                  className={cn(
-                    "w-full max-w-10 rounded-t-sm bg-primary/60 group-hover:bg-primary",
-                    index === visible.length - 1 && "bg-primary",
-                  )}
-                  style={{ height: `${Math.max(height, day.costUsd > 0 ? 2 : 0)}%` }}
-                />
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <div
+                        className={cn(
+                          "w-full max-w-10 rounded-t-sm bg-primary/60 hover:bg-primary",
+                          index === visible.length - 1 && "bg-primary",
+                        )}
+                        style={{ height: `${Math.max(height, day.costUsd > 0 ? 2 : 0)}%` }}
+                      />
+                    }
+                  />
+                  <TooltipPopup>
+                    {day.day} · {formatUsd(day.costUsd)} · {formatCount(day.requests)} 次请求
+                  </TooltipPopup>
+                </Tooltip>
               </div>
             );
           })}
@@ -142,7 +147,7 @@ function SpendBars({
           <span
             key={day.day}
             className={cn(
-              "min-w-0 flex-1 text-center text-[9px] text-muted-foreground tabular-nums",
+              "min-w-0 flex-1 text-center text-4xs text-muted-foreground tabular-nums",
               // Keep the axis readable when the window holds many days.
               visible.length > 14 && index % 3 !== 0 && "invisible",
             )}
@@ -167,7 +172,14 @@ function ModelDonut({ models }: { readonly models: readonly UsageRelayModel[] })
       <div className="flex items-center gap-5">
         <div className="relative size-32 shrink-0">
           <svg viewBox="0 0 132 132" className="size-full -rotate-90">
-            <circle cx="66" cy="66" r={radius} fill="none" stroke="var(--secondary)" strokeWidth="20" />
+            <circle
+              cx="66"
+              cy="66"
+              r={radius}
+              fill="none"
+              stroke="var(--secondary)"
+              strokeWidth="20"
+            />
             {total > 0
               ? top.map((model, index) => {
                   const share = model.costUsd / total;
@@ -191,7 +203,7 @@ function ModelDonut({ models }: { readonly models: readonly UsageRelayModel[] })
               : null}
           </svg>
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-[10px] text-muted-foreground">合计</span>
+            <span className="text-3xs text-muted-foreground">合计</span>
             <span className="text-sm font-semibold text-foreground tabular-nums">
               {compactUsd(total)}
             </span>
@@ -204,7 +216,7 @@ function ModelDonut({ models }: { readonly models: readonly UsageRelayModel[] })
                 className="size-2 shrink-0 rounded-full"
                 style={{ background: DONUT_COLORS[index % DONUT_COLORS.length] }}
               />
-              <span className="truncate font-mono text-[11px] text-foreground">{model.model}</span>
+              <span className="truncate font-mono text-2xs text-foreground">{model.model}</span>
               <span className="shrink-0 text-muted-foreground tabular-nums">
                 {total > 0 ? `${((model.costUsd / total) * 100).toFixed(0)}%` : "0%"}
               </span>
@@ -216,7 +228,7 @@ function ModelDonut({ models }: { readonly models: readonly UsageRelayModel[] })
       <div className="overflow-x-auto">
         <table className="w-full min-w-72 border-collapse text-xs">
           <thead>
-            <tr className="text-[10px] tracking-wide text-muted-foreground uppercase">
+            <tr className="text-3xs tracking-wide text-muted-foreground uppercase">
               <th className="border-b border-border py-2 text-left font-medium">模型</th>
               <th className="border-b border-border py-2 text-right font-medium">请求</th>
               <th className="border-b border-border py-2 text-right font-medium">Token</th>
@@ -226,7 +238,7 @@ function ModelDonut({ models }: { readonly models: readonly UsageRelayModel[] })
           <tbody>
             {top.map((model) => (
               <tr key={model.model}>
-                <td className="border-b border-border/40 py-2 pr-2 font-mono text-[11px] text-foreground">
+                <td className="border-b border-border/40 py-2 pr-2 font-mono text-2xs text-foreground">
                   {model.model}
                 </td>
                 <td className="border-b border-border/40 py-2 text-right text-muted-foreground tabular-nums">
@@ -265,12 +277,10 @@ export function RelayUsageView({
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center gap-2">
-        <h2 className="text-lg font-semibold text-foreground">
-          {relay.planName ?? "未命名套餐"}
-        </h2>
+        <h2 className="text-lg font-semibold text-foreground">{relay.planName ?? "未命名套餐"}</h2>
         <span
           className={cn(
-            "rounded-full border px-2.5 py-0.5 text-[11px]",
+            "rounded-full border px-2.5 py-0.5 text-2xs",
             relay.isValid
               ? "border-success/40 text-success"
               : "border-destructive/40 text-destructive",
@@ -279,16 +289,16 @@ export function RelayUsageView({
           {relay.isValid ? "有效" : "失效"}
           {expiry === null ? "" : ` · ${expiry}`}
         </span>
-        <span className="rounded-full border border-border px-2.5 py-0.5 text-[11px] text-muted-foreground">
+        <span className="rounded-full border border-border px-2.5 py-0.5 text-2xs text-muted-foreground">
           {relay.unit} 额度制{relay.mode === null ? "" : ` · ${relay.mode}`}
         </span>
-        <span className="ms-auto text-[11px] text-muted-foreground">{relay.endpoint}</span>
+        <span className="ms-auto text-2xs text-muted-foreground">{relay.endpoint}</span>
       </div>
 
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-card px-5 py-4">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="flex flex-col gap-1">
-            <span className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+            <span className="text-2xs font-medium tracking-wide text-muted-foreground uppercase">
               今日已用 / 上限
             </span>
             <span className="text-3xl font-semibold text-foreground tabular-nums">
@@ -302,16 +312,16 @@ export function RelayUsageView({
             </span>
           </div>
           <div className="flex flex-col items-end gap-1">
-            <span className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+            <span className="text-2xs font-medium tracking-wide text-muted-foreground uppercase">
               今日剩余
             </span>
             <span className="text-3xl font-semibold text-success tabular-nums">
-              {remaining === null ? "—" : formatUsd(remaining)}
+              {remaining === null ? "n/a" : formatUsd(remaining)}
             </span>
           </div>
         </div>
         {limit === null ? null : <QuotaBar used={used} limit={limit} />}
-        <div className="flex flex-wrap justify-between gap-2 text-[11px] text-muted-foreground tabular-nums">
+        <div className="flex flex-wrap justify-between gap-2 text-2xs text-muted-foreground tabular-nums">
           <span>{limit === null ? "无日额度上限" : `${(share * 100).toFixed(1)}% 已用`}</span>
           <span>
             本周 {formatUsd(relay.weeklyUsedUsd ?? 0)}
@@ -334,7 +344,7 @@ export function RelayUsageView({
           <SpendBars days={relay.days} windowDays={windowDays} />
         </div>
         <div className="rounded-lg border border-border bg-card px-5 py-4">
-          <p className="mb-3 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+          <p className="mb-3 text-2xs font-medium tracking-wide text-muted-foreground uppercase">
             按模型实际消费
           </p>
           <ModelDonut models={relay.models} />
