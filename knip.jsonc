@@ -4,6 +4,14 @@
   "rules": { "types": "off", "nsTypes": "off" },
   // These executables are supplied by the OS or installed separately from npm.
   "ignoreBinaries": ["eas", "file", "mkfifo", "pkill", "pkg-config", "plutil", "sips"],
+  // This fork dropped the release/mobile workflows, so their entry points are gone while the
+  // scripts stay in the tree for reference. Re-add a caller before relying on them again.
+  "ignore": [
+    ".github/scripts/mirror-play-apk.cjs",
+    "apps/web/scripts/verify-built-boot.ts",
+    "scripts/resolve-nightly-release.ts",
+    "scripts/smoke-cli-archive.ts",
+  ],
   "workspaces": {
     ".": {
       // Keep vendored reference repositories outside the root project.

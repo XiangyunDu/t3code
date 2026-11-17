@@ -1,5 +1,10 @@
+// @effect-diagnostics nodeBuiltinImport:off - reads the Codex home; this leaf must not widen the
+// usage service's environment just to look at two files.
+// @effect-diagnostics globalFetch:off - one plain GET to the relay's usage endpoint, wrapped in a
+// timeout and swallowed on failure.
+// @effect-diagnostics globalDate:off - cache freshness is plain wall-clock milliseconds.
 import * as Effect from "effect/Effect";
-import * as NodeFS from "node:fs/promises";
+import * as NodeFSP from "node:fs/promises";
 import * as NodeOS from "node:os";
 import * as NodePath from "node:path";
 
@@ -22,14 +27,14 @@ function codexHome(): string {
 
 async function readTextFile(path: string): Promise<string | null> {
   try {
-    return await NodeFS.readFile(path, "utf8");
+    return await NodeFSP.readFile(path, "utf8");
   } catch {
     return null;
   }
 }
 
 /** `model_providers.<name>.base_url` for the provider `model_provider` points at. */
-export function parseProviderBaseUrl(toml: string): string | null {
+function parseProviderBaseUrl(toml: string): string | null {
   const sections = new Map<string, string>();
   let current: string | undefined;
   for (const line of toml.split(/\r?\n/)) {
