@@ -61,7 +61,7 @@ jobs:
       - run: node apps/server/node_modules/playwright-core/cli.js install --only-shell chromium
       # 两核机器上默认并发会互相拖死，和上游一致限到 4
       # 用 exec 直接调 vp：`pnpm test -- --shard` 会把参数当成文件过滤，导致每片都跑全量
-      - run: pnpm --filter t3 exec vp test run --shard ${{ matrix.shard }}/8 --concurrency 4
+      - run: pnpm --filter t3 exec vp test run --shard ${{ matrix.shard }}/8
 
   test-web-unit:
     name: Tests (web unit ${{ matrix.shard }}/2)
