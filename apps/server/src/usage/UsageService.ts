@@ -1184,7 +1184,10 @@ export const make = Effect.gen(function* () {
       scanDurationMs: Math.max(0, finishedAtMs - startedAtMs),
       ...(input.modelFilter === undefined ? {} : { modelFilter: input.modelFilter }),
     } satisfies UsageSummary;
-    return { summary, fromMemory };
+    // The relay knows the real quota and spend; transcripts only estimate list price. Attach it
+    // once, while the summary is built, so repeated reads of this cached object keep its identity.
+    const relay = yield* readRelayUsage(input.awaitRefresh === true);
+    return { summary: relay === null ? summary : { ...summary, relay }, fromMemory };
   });
 
   const readWindow = Effect.fn("UsageService.readWindow")(function* (
@@ -1250,10 +1253,7 @@ export const make = Effect.gen(function* () {
         return created;
       }),
     );
-    const summary = yield* Deferred.await(deferred);
-    // The relay knows the real quota and spend; transcripts only estimate list price.
-    const relay = yield* readRelayUsage(requested.awaitRefresh === true);
-    return { ...summary, relay };
+    return yield* Deferred.await(deferred);
   });
 
   return { readSummary, refreshRates, awaitPersisted } as const;
